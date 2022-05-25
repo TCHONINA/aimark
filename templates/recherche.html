@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Marks</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/dc522288eb.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
+            integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"
+            integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy"
+            crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+
+{% include 'header.html' %}
+
+<form class="form-sample container mt-5" method="POST" action="/mark/add" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3 row">
+        <label for="name" class="col-sm-2 col-form-label">Titre</label>
+        <div class="col-sm-10">
+            {{ form.title }}
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label for="image" class="col-sm-2 col-form-label">Image</label>
+        <div class="col-sm-10">
+            {{ form.image }}
+
+        </div>
+    </div>
+
+    <div class="row">
+        <button class="btn btn-primary" style="width: 100px">Ajouter</button>
+    </div>
+
+</form>
+<div class="container mt-5">
+    <div class="card-header">
+        <div class="input-group">
+            <div class="form-outline">
+                <input type="search" class="form-control" />
+            </div>
+            <button type="button" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">title</th>
+                <th scope="col">image</th>
+                <th scope="col">created_at</th>
+                <th scope="col">Action</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for mark in marks %}
+                <tr>
+                    <th scope="row">{{ mark.id }}</th>
+                    <td>{{ mark.name }}</td>
+                    <td>{{ mark.image }}</td>
+                    <td>{{ mark.created_at }}</td>
+                    <td><a class="btn btn-primary" href="/mark/edit/{{ mark.id }}">Edit</a>
+                        <a class="btn btn-danger" href="/mark/delete/{{ mark.id }}">delete</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% include 'footer.html' %}
+
+</body>
+</html>

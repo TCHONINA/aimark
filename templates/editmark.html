@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Marks</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
+            integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"
+            integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="{% static 'paper-full.js' %}"></script>
+
+</head>
+<body>
+{% include 'header.html' %}
+
+
+<form class="form-sample container mt-5" method="POST" action="/mark/edit/{{ form.id.value }}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3 row">
+        <label for="name" class="col-sm-2 col-form-label">Titre</label>
+        <div class="col-sm-10">
+            {{ form.title }}
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label for="image" class="col-sm-2 col-form-label">Image</label>
+        <div class="col-sm-10">
+            {{ form.image }}
+
+        </div>
+    </div>
+
+    <div class="row">
+        <button class="btn btn-primary " style="width: 100px;margin-right: 20px">Modifier</button>
+            <a href="/mark/points/delete/{{ form.id.value }}" class="btn btn-danger" style="width: 100px">Supprimer</a>
+
+    </div>
+    <div class="col-md-12">
+
+        <canvas id="markimagecanvas" style="width: 70vw">
+
+        </canvas>
+        <img src="{{ form.image.value.url }}" id="markimage"
+             style="display:none;width: 100%;height: 100%">
+
+    </div>
+</form>
+
+
+<script type="text/paperscript" canvas="markimagecanvas">
+    // Load from Server:
+    var counter = 0
+    var myraster = new Raster('markimage');
+
+    myraster.position = view.center;
+    myraster.scale(0.3);
+
+
+    var mypath = new Path();
+    mypath.selected = true;
+    mypath.strokeColor = '#d92d2d';
+
+    {% for point in points %}
+        console.log({{ point.num }})
+        mypath.insert({{ point.num }}, new Point({{ point.x }}, {{ point.y }}));
+
+        {% if points.last %}
+            counter ={{ point.num }}
+        {% endif %}
+    {% endfor %}
+
+
+    function onMouseDown(event) {
+        $.ajax({
+            url: '/mark/points/add/{{ form.id.value }}',
+            method: 'post',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'count': counter++,
+                'x': event.point.x,
+                'y': event.point.y
+            },
+            success: function (e) {
+                mypath.insert(counter, event.point);
+            },
+
+
+        })
+
+
+    }
+
+
+</script>
+
+{% include 'footer.html' %}
+
+
+</body>
+</html>
